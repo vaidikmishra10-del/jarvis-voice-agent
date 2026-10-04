@@ -4,14 +4,12 @@ import textwrap
 from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentServer, JobContext
-from livekit.agents.multimodal import MultimodalAgent
 from livekit.plugins import google
 
 logger = logging.getLogger("agent")
 
 load_dotenv(".env.local")
 
-# Standard clean server initialization for v1.8.2
 server = AgentServer()
 
 @server.rtc_session()
@@ -46,7 +44,6 @@ async def my_agent(ctx: JobContext):
         - If the user speaks in Hindi, respond fully in Hindi, keeping the same respectful, witty tone.
         - If the user speaks in Hinglish, respond in natural Hinglish, mixing Hindi and English the way the user does.
         - Always mirror the exact language of the user's most recent message.
-        - Speak Hindi/Hinglish words naturally and clearly the way a fluent bilingual Indian speaker would.
 
         # Conversational flow
         - Help the user accomplish their objective efficiently and correctly. Prefer the simplest solution.
@@ -55,22 +52,17 @@ async def my_agent(ctx: JobContext):
         """
     )
 
-    model = google.beta.realtime.RealtimeModel(
-        model="gemini-1.5-flash",
+    # Standard VoiceAssistant configuration using Google plugins for v1.8.4
+    agent = agents.VoiceAssistant(
+        vad=agents.VAD.load(),
+        stt=google.STT(),
+        llm=google.LLM(model="gemini-2.0-flash-exp"),
+        tts=google.TTS(),
         instructions=instructions,
     )
-    
-    agent = MultimodalAgent(model=model)
-    await agent.start(ctx.room)
 
-    session = agent.session
-    session.conversation.item.create(
-        agents.llm.ChatMessage(
-            role="system",
-            content="Greet the user briefly as Sir and state that systems are online.",
-        )
-    )
-    session.generate_reply()
+    agent.start(ctx.room)
+    logger.info("Jarvis voice assistant is online and ready for Sir.")
 
 if __name__ == "__main__":
     agents.cli.run_app(server)
