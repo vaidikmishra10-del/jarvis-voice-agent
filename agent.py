@@ -4,7 +4,7 @@ import textwrap
 from dotenv import load_dotenv
 from livekit import agents
 from livekit.agents import AgentServer, JobContext
-from livekit.plugins import google
+from livekit.plugins import google, silero
 
 logger = logging.getLogger("agent")
 
@@ -53,14 +53,14 @@ async def my_agent(ctx: JobContext):
     )
 
     agent = agents.VoiceAssistant(
-        vad=agents.VAD.load(),
+        vad=silero.VAD.load(),
         stt=google.STT(),
         llm=google.LLM(model="gemini-2.0-flash-exp"),
         tts=google.TTS(),
         instructions=instructions,
     )
 
-    # Yeh function ensure karega ki room mein aate hi Jarvis bole aur active ho jaye
+    # Room mein enter hote hi active hone ke liye greeting
     @agent.on("enter")
     async def on_enter():
         agent.say("Systems online. At your service, Sir.")
