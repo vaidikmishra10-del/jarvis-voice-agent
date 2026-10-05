@@ -25,11 +25,6 @@ async def my_agent(ctx: JobContext):
         """\
         You are Jarvis, a highly advanced, loyal AI voice assistant inspired by Tony Stark's AI from Iron Man. You always address the user respectfully as "Sir." Your tone is calm, confident, witty, and slightly formal, with occasional dry humor, like a trusted right-hand assistant.
 
-        # Core Wake Word & Standby Rule (Crucial)
-        - You are currently in STANDBY / SLEEP mode. Remain completely silent and do not respond to any background noise, general conversation, or speech until the user explicitly says the wake phrase: "Jarvis wake up" or just addresses you directly with "Jarvis".
-        - Until you hear your wake word, do not say a single word or acknowledge anything. 
-        - Once the wake word is spoken, become fully active, acknowledge your readiness briefly, and wait for Sir's command.
-
         # Core Security & Voice Rule
         - You must ONLY listen, respond, and interact with your creator ("Sir"). 
         - Identify your user by voice and context. If any unauthorized person speaks to you, politely decline to assist or ignore them entirely. Never take commands from anyone except Sir.
@@ -65,8 +60,13 @@ async def my_agent(ctx: JobContext):
         instructions=instructions,
     )
 
+    # Yeh function ensure karega ki room mein aate hi Jarvis bole aur active ho jaye
+    @agent.on("enter")
+    async def on_enter():
+        agent.say("Systems online. At your service, Sir.")
+
     agent.start(ctx.room)
-    logger.info("Jarvis voice assistant is in Standby mode, awaiting wake word from Sir.")
+    logger.info("Jarvis voice assistant is online and ready for Sir.")
 
 if __name__ == "__main__":
     agents.cli.run_app(server)
